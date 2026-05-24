@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1020" />
+  <title>Task Flow</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg-blur bg-one"></div>
+  <div class="bg-blur bg-two"></div>
+
+  <main class="app">
+    <section class="card">
+      <div class="topbar">
+        <div class="badge">
+          <span class="dot"></span>
+          Premium Task Space
+        </div>
+        <h1>Task Flow</h1>>
+      </div>
+
+      <div class="input-row">
+        <input type="text" class="task-input" placeholder="Yangi task yoz..." />
+        <button class="add-btn">Add</button>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <span class="label">All</span>
+          <strong>12</strong>
+        </div>
+        <div class="stat">
+          <span class="label">Active</span>
+          <strong>8</strong>
+        </div>
+        <div class="stat">
+          <span class="label">Done</span>
+          <strong>4</strong>
+        </div>
+      </div>
+
+      <div class="tasks">
+        <div class="task">
+          <div class="task-left">
+            <div class="check"></div>
+            <div class="task-text">
+              <h3>Design the next dashboard UI</h3>
+              <p>High priority · Today</p>
+            </div>
+          </div>
+          <div class="task-actions">
+            <button class="icon-btn">✎</button>
+            <button class="icon-btn danger">🗑</button>
+          </div>
+        </div>
+
+        <div class="task done">
+          <div class="task-left">
+            <div class="check checked">✓</div>
+            <div class="task-text">
+              <h3>Finish Go basics revision</h3>
+              <p>Completed · 2 hours ago</p>
+            </div>
+          </div>
+          <div class="task-actions">
+            <button class="icon-btn">✎</button>
+            <button class="icon-btn danger">🗑</button>
+          </div>
+        </div>
+
+        <div class="task">
+          <div class="task-left">
+            <div class="check"></div>
+            <div class="task-text">
+              <h3>Prepare backend architecture notes</h3>
+              <p>Work session · Evening</p>
+            </div>
+          </div>
+          <div class="task-actions">
+            <button class="icon-btn">✎</button>
+            <button class="icon-btn danger">🗑</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span>Focus mode: ON</span>
+      </div>
+    </section>
+  </main>
+  <script src="./script.js"></script>
+</body>
+</html>

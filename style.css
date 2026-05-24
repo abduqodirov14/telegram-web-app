@@ -212,7 +212,8 @@ h1 {
   padding: 24px 34px 0;
 }
 
-.task {
+.task,
+.task-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -224,7 +225,8 @@ h1 {
   transition: 0.25s ease;
 }
 
-.task:hover {
+.task:hover,
+.task-item:hover {
   transform: translateY(-2px);
   border-color: rgba(255,255,255,0.12);
   background: rgba(255,255,255,0.06);
@@ -238,7 +240,8 @@ h1 {
   flex: 1;
 }
 
-.check {
+.check,
+.check-btn {
   width: 24px;
   height: 24px;
   border-radius: 8px;
@@ -250,6 +253,13 @@ h1 {
   color: white;
   font-size: 13px;
   transition: 0.25s ease;
+  cursor: pointer;
+}
+
+.check-btn:hover,
+.check:hover {
+  border-color: rgba(255,255,255,0.3);
+  transform: translateY(-1px);
 }
 
 .checked {
@@ -262,7 +272,8 @@ h1 {
   min-width: 0;
 }
 
-.task-text h3 {
+.task-text h3,
+.task-title {
   font-size: 15px;
   font-weight: 600;
   letter-spacing: 0.01em;
@@ -270,12 +281,14 @@ h1 {
   word-break: break-word;
 }
 
-.task-text p {
+.task-text p,
+.task-meta {
   font-size: 12px;
   color: var(--muted);
 }
 
-.done .task-text h3 {
+.done .task-text h3,
+.task-item.done .task-title {
   color: rgba(244, 247, 251, 0.72);
   text-decoration: line-through;
   text-decoration-thickness: 2px;
@@ -331,6 +344,25 @@ h1 {
   border: 1px solid rgba(255,255,255,0.07);
 }
 
+.empty {
+  padding: 30px 18px;
+  border-radius: 20px;
+  text-align: center;
+  background: rgba(255,255,255,0.035);
+  border: 1px dashed rgba(255,255,255,0.12);
+}
+
+.empty h3 {
+  font-size: 18px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.empty p {
+  color: var(--muted);
+  font-size: 13px;
+}
+
 @media (max-width: 640px) {
   body {
     overflow: auto;
@@ -358,7 +390,8 @@ h1 {
     grid-template-columns: 1fr;
   }
 
-  .task {
+  .task,
+  .task-item {
     flex-direction: column;
     align-items: flex-start;
   }

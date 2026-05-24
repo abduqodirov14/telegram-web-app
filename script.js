@@ -1,6 +1,5 @@
 const API_URL = "https://my-first-golang-project.onrender.com/tasks";
 
-
 const taskInput = document.getElementById("taskInput");
 const addBtn = document.getElementById("addBtn");
 const tasksList = document.getElementById("tasksList");
@@ -12,18 +11,34 @@ const doneCount = document.getElementById("doneCount");
 let tasks = [];
 
 document.addEventListener("DOMContentLoaded", () => {
-  loadTasks();
   setupEvents();
+  loadTasks();
 });
 
 function setupEvents() {
-  addBtn.addEventListener("click", handleAddTask);
+  if (addBtn) {
+    addBtn.addEventListener("click", handleAddTask);
+  }
 
-  taskInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      handleAddTask();
-    }
-  });
+  if (taskInput) {
+    taskInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        handleAddTask();
+      }
+    });
+  }
+}
+
+function getTaskName(task) {
+  return task?.taskName ?? task?.TaskName ?? task?.name ?? "";
+}
+
+function getTaskDone(task) {
+  return Boolean(task?.completed ?? task?.Completed ?? task?.done ?? false);
+}
+
+function getTaskId(task, index) {
+  return task?.id ?? task?.ID ?? task?.Id ?? index + 1;
 }
 
 async function loadTasks() {
@@ -34,16 +49,27 @@ async function loadTasks() {
       throw new Error("Tasklarni olishda xatolik");
     }
 
-    tasks = await response.json();
+    const data = await response.json();
+    tasks = Array.isArray(data) ? data : [];
+
     renderTasks();
     updateStats();
   } catch (error) {
     console.error(error);
-    tasksList.innerHTML = `<div class="empty">Tasklarni yuklab bo‘lmadi</div>`;
+    if (tasksList) {
+      tasksList.innerHTML = `
+        <div class="empty">
+          <h3>Tasklarni yuklab bo‘lmadi</h3>
+          <p>Backend va CORS sozlamalarini tekshiring.</p>
+        </div>
+      `;
+    }
   }
 }
 
 function renderTasks() {
+  if (!tasksList) return;
+
   if (!tasks || tasks.length === 0) {
     tasksList.innerHTML = `
       <div class="empty">
@@ -55,25 +81,29 @@ function renderTasks() {
   }
 
   tasksList.innerHTML = tasks
-    .map((task) => {
+    .map((task, index) => {
+      const name = escapeHTML(getTaskName(task));
+      const done = getTaskDone(task);
+      const id = getTaskId(task, index);
+
       return `
-        <div class="task-item ${task.completed ? "done" : ""}" data-id="${task.id}">
+        <div class="task-item ${done ? "done" : ""}" data-id="${id}" data-index="${index}">
           <div class="task-left">
-            <button class="check-btn" data-action="toggle" data-id="${task.id}">
-              ${task.completed ? "✓" : ""}
+            <button class="check-btn ${done ? "checked" : ""}" type="button" data-action="toggle" data-id="${id}" data-index="${index}">
+              ${done ? "✓" : ""}
             </button>
 
             <div class="task-text">
-              <div class="task-title">${escapeHTML(task.taskName)}</div>
+              <div class="task-title">${name}</div>
               <div class="task-meta">
-                ${task.completed ? "Completed" : "Active"}
+                ${done ? "Completed" : "Active"}
               </div>
             </div>
           </div>
 
           <div class="task-actions">
-            <button class="icon-btn" data-action="edit" data-id="${task.id}">✎</button>
-            <button class="icon-btn danger" data-action="delete" data-id="${task.id}">🗑</button>
+            <button class="icon-btn" type="button" data-action="edit" data-id="${id}" data-index="${index}">✎</button>
+            <button class="icon-btn danger" type="button" data-action="delete" data-id="${id}" data-index="${index}">🗑</button>
           </div>
         </div>
       `;
@@ -84,22 +114,28 @@ function renderTasks() {
 }
 
 function bindTaskButtons() {
+  if (!tasksList) return;
+
   const buttons = tasksList.querySelectorAll("[data-action]");
 
   buttons.forEach((btn) => {
     btn.addEventListener("click", async () => {
       const action = btn.dataset.action;
-      const id = btn.dataset.id;
+      const index = Number(btn.dataset.index);
+      const task = tasks[index];
+
+      if (!task && action !== "delete") {
+        return;
+      }
+
+      const id = getTaskId(task, index);
 
       if (action === "delete") {
         await deleteTask(id);
       }
 
       if (action === "toggle") {
-        const task = tasks.find((t) => String(t.id) === String(id));
-        if (task) {
-          await toggleTask(id, !task.completed);
-        }
+        await toggleTask(id, !getTaskDone(task));
       }
 
       if (action === "edit") {
@@ -110,7 +146,7 @@ function bindTaskButtons() {
 }
 
 async function handleAddTask() {
-  const taskName = taskInput.value.trim();
+  const taskName = taskInput ? taskInput.value.trim() : "";
 
   if (!taskName) {
     alert("Task yozing");
@@ -132,7 +168,10 @@ async function handleAddTask() {
       throw new Error("Task qo‘shishda xatolik");
     }
 
-    taskInput.value = "";
+    if (taskInput) {
+      taskInput.value = "";
+    }
+
     await loadTasks();
   } catch (error) {
     console.error(error);
@@ -181,10 +220,11 @@ async function toggleTask(id, newStatus) {
 }
 
 async function editTask(id) {
-  const task = tasks.find((t) => String(t.id) === String(id));
+  const task = tasks.find((t, index) => String(getTaskId(t, index)) === String(id));
   if (!task) return;
 
-  const newName = prompt("Yangi task nomini yozing:", task.taskName);
+  const currentName = getTaskName(task);
+  const newName = prompt("Yangi task nomini yozing:", currentName);
 
   if (newName === null) return;
 
@@ -202,7 +242,7 @@ async function editTask(id) {
       },
       body: JSON.stringify({
         taskName: trimmed,
-        completed: task.completed,
+        completed: getTaskDone(task),
       }),
     });
 
@@ -219,7 +259,7 @@ async function editTask(id) {
 
 function updateStats() {
   const total = tasks.length;
-  const done = tasks.filter((task) => task.completed).length;
+  const done = tasks.filter((task) => getTaskDone(task)).length;
   const active = total - done;
 
   if (allCount) allCount.textContent = total;
